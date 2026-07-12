@@ -197,9 +197,11 @@
 |---|---|---|
 | 업종 `pack_id`/`industry_def.id` | `<slug>` | `trade` |
 | 부서 `dept_types[].id` | `<slug>.<dept_slug>` | `trade.sourcing` |
-| 프로젝트 `catalog_id` | `<slug>.<dept_slug>.t<N>` | `trade.sourcing.t5` |
+| 프로젝트 `catalog_id` | `<slug>.<dept_slug>[.<category_slug>].t<N>` | `trade.sourcing.t5`, `gamedev.dev.self.t1` |
 | 상비 의뢰 `catalog_id` | `<slug>.staple` | `trade.staple` |
 | 품목군 `id` | `<group_slug>` | `electronics` |
+
+- **카테고리 세그먼트 규칙:** 부서에 카테고리(프로젝트 계열)가 **1개뿐이면 생략**하고(무역: `trade.sourcing.t5`), **2개 이상이면 카테고리 슬러그를 반드시 포함**한다(게임개발 개발부 A/B: `gamedev.dev.self.t1`·`gamedev.dev.outsource.t1`, 화장품 R&D·생산부: `cosmetics.rnd.line_dev.t1`·`cosmetics.production.own_line.t1`). `catalog_id`는 오름차순 정렬 키일 뿐이므로 세그먼트 수는 로더에 영향이 없다(불투명 정렬 문자열, [MS §1.2]). 로케일 키(`catalog.*.name|flavor`)도 동일 구조를 미러링한다([conv §4.1]).
 
 - **`catalog_id`는 정렬 키**([TA §2.5] "catalog_id 정렬", [MS §1.2] 타이브레이커). 로더는 `catalog_id` 오름차순 뷰를 유지한다. 파일 내 배열 순서(본 인스턴스는 부서별 그룹핑)는 권장 가독 순서일 뿐 비권위적이다.
 - **런타임 엔티티 ID(u64 카운터, [TA §2.1])와 별개다.** `catalog_id`는 정적 콘텐츠 식별자, 엔티티 ID는 인스턴스 생성 시 부여되는 결정론 카운터다.

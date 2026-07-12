@@ -122,12 +122,14 @@ ko: "{q, select, hit {히트작이에요!! 꼬리 수익이 한동안 들어와�
 
 ### 4.1 카탈로그 키 형태
 ```
-catalog.<industry>.<dept>.<tier>[.<slot>]
-        │          │       │       └ name | flavor | (선택) desc
-        │          │       └ t1~t5
+catalog.<industry>.<dept>[.<category>].<tier>[.<slot>]
+        │          │        │           │       └ name | flavor | (선택) desc
+        │          │        │           └ t1~t5
+        │          │        └ (부서에 카테고리 2개 이상일 때만) self|outsource|service|own|line_dev|oem|own_line ...
         │          └ sourcing | logistics | dev | liveops | rnd | production | sales
         └ trade | gamedev | cosmetics   (업종 slug)
 ```
+- **카테고리 세그먼트 규칙(content-schema §10과 동일):** 부서 카테고리가 1개면 생략(`catalog.trade.sourcing.t5`), 2개 이상이면 포함(`catalog.gamedev.dev.self.t1`, `catalog.cosmetics.rnd.line_dev.t1`). `catalog_id`와 로케일 키가 동일 구조를 미러링한다.
 - **업종 표시명:** `catalog.<industry>.industry_def.name`
 - **부서 표시명:** `catalog.<industry>.<dept>.dept_name` (공통 영업부는 용어집 기존 값 `dept.sales` 재사용, 신설 금지 — narrative §5.3)
 - **기능명(직역 원칙):** `catalog.trade.sourcing.t5.name` → game-design §12 카탈로그 기능명 정본
