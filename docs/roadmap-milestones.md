@@ -60,7 +60,7 @@ GD 게임디자인 · ENG 엔지니어링 · UX · ART · AUD 오디오 · BM �
 
 ### Phase 1.4 — 데이터·콘텐츠 기반 (`mechanics-spec.md §10`·`technical-architecture.md §7`)
 - `▶` **1.4.1** 콘텐츠 팩 데이터 스키마 인스턴스화 — 무역 업종을 실제 기계판독 데이터로 (GD·ENG) → `content-schema.md`, `data/content/trading.json`
-- `▶` **1.4.2** 문자열 키 규약·테이블 골격(ICU) + 용어집(glossary) 골격 (LOC·UX) → `localization/`
+- `✅` **1.4.2** 문자열 키 규약·테이블 골격(ICU) + 용어집(glossary) 골격 (LOC·UX) → `docs/localization/`, `data/localization/strings.sample.json`
 - `☐` **1.4.3** 데이터 파이프라인(밸런스/카탈로그/문자열/리모트 config) 설계 확정 (ENG) — technical §7 기반, 후속
 - `☐` **1.4.4** 서버 API 계약 골격(엔드포인트·스키마·인증) 초안 (ENG) — 벤더 선정(D-106) 후 확정
 
