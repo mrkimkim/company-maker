@@ -74,11 +74,21 @@
 - **데이터 모델·세이브·시뮬레이션 루프·플랫폼 SDK**: `technical-architecture.md`.
 - **일정·QA·리스크**: `production-qa-risk.md`.
 
-### 2.4 개발 착수 기준 (Definition of Ready)
+### 2.4 재화 표기 규약
+- 게임 내 **자금**은 전용 아이콘을 1차로 노출하고 `₩` 텍스트 기호는 폴백으로만 쓴다. **골드·다이아**는 각각 전용 아이콘. **스토어 실화폐 가격**은 스토어 제공 현지 통화로 표기한다. 정본은 `accessibility-localization.md §8.6`(UX·아트·수익화가 준수). 게임 재화 `₩`와 실화폐 `₩`(원화 가격)를 절대 혼동 표기하지 않는다.
+
+### 2.5 개발 착수 기준 (Definition of Ready)
 각 문서는 "이 문서만 보고 해당 파트 개발/제작에 착수할 수 있는가"를 자기 검증한다. 부족분은 각 문서 말미 "열린 질문"에 남긴다.
+
+### 2.6 문서 상태·개정 관리
+- **정본 개정 우선 원칙:** 게임 규칙을 바꾸는 결정은 반드시 `game-design.md` 개정으로 선행한다. 하위 문서가 규칙 변경을 필요로 하면 `[game-design 개정 필요]` 태그로 표기하고, 승인 전까지 해당 규칙을 임의로 신설하지 않는다.
+- **미결 개정 안건·교차 이슈의 단일 집결지는 `production-qa-risk.md §A5`(규칙 개정 안건)와 §C9(리스크 레지스터)**다. 여러 문서에 걸친 미결 결정(예: 사이클↔실시간 매핑, 확률 공시 법무, 리아 캐스팅, 색 토큰, 런치 전 동결 3종)은 이곳에서 추적한다.
+- 문서 상태는 §0 문서 맵의 ✅로 표기한다. 초안 완성 ≠ 결정 확정 — 각 문서의 "열린 질문"과 `production-qa-risk.md`의 준비도 체크리스트(§C10)가 실제 착수 가능 여부를 정의한다.
 
 ---
 
 ## 3. 읽는 순서 (권장)
 
 1. `game-design.md` (규칙 이해) → 2. `narrative-tone.md` (톤 프레임) → 3. `mechanics-spec.md` + `balance.md` (구현·수치) → 4. `ux-design.md` + `art-direction.md` + `audio-design.md` (표현) → 5. `monetization.md` + `marketing.md` (사업) → 6. `technical-architecture.md` + `liveops-analytics.md` (구축·운영) → 7. `accessibility-localization.md` + `production-qa-risk.md` (품질·일정).
+
+> **개발 착수 전 필독:** 문서 세트 전반의 미결 핵심 결정과 착수 준비도는 `production-qa-risk.md`(§A5·§C9·§C10)에 종합돼 있다. 실제 프로덕션 킥오프는 이 문서의 "지금 결정해야 할 항목"부터 확인할 것.

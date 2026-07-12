@@ -21,7 +21,7 @@
 | 접근성·현지화·언어 로드맵 | `accessibility-localization.md`(예정) | 로컬라이즈드 ASO·지역 전략의 언어·문화 정본(§3.6·§7) |
 | 일정·QA·리스크 레지스터 | `production-qa-risk.md`(예정) | 마케팅 리스크의 대응·일정 정본(§9.2) |
 
-> **참조 문서 상태 주의:** README §0은 문서 #10~#12(`liveops-analytics`·`accessibility-localization`·`production-qa-risk`)를 완료(✅)로 표시하나, 본 문서 작성 시점 리포지터리에는 아직 존재하지 않는다. 본 문서는 이들을 **계획된 정본**으로 간주해 앵커(§)로 참조하며, 해당 문서 확정 시 상호 정합 리뷰가 필요한 지점을 §열린 질문에 남긴다.
+> **참조 경계:** 문서 #10~#12(`liveops-analytics`·`accessibility-localization`·`production-qa-risk`)는 모두 확정·존재한다. 본 문서는 KPI·지표 정본을 `liveops-analytics`에, 지역·규제 세부를 `accessibility-localization`에, 일정·리스크를 `production-qa-risk`에 위임하고 마케팅 관점 레버만 소유한다. 소프트런치 정량 목표치는 `liveops-analytics`와 실측 기반으로 공동 확정한다(§4.2).
 
 ### 0.2 의존 전제 (README §1)
 
