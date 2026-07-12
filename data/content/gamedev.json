@@ -1,0 +1,590 @@
+{
+  "schema_version": "1.0.0",
+  "pack_id": "gamedev",
+  "pack_version": "1.0.0",
+  "refs": {
+    "catalog": "game-design.md §12.3",
+    "schema": "mechanics-spec.md §8.3, §10.1, §10.6",
+    "balance": "balance.md §1(posting_ttl), §4.1, §4.2, §5.1, §5.4, §6.2 (튜닝 1차안)",
+    "locale": "docs/localization/string-key-convention.md §4, glossary.md §6",
+    "note_no_c0": "게임개발 전 카탈로그 c0=0 — C₀>0 없음, 전 부서 자율 위임 가능 (game-design §12.3, balance §5.5).",
+    "note_catalog_id": "개발부·라이브운영부는 부서당 카테고리 2종이므로 catalog_id를 <slug>.<dept_slug>.<line>.t<N>로 확장(무역=단일 카테고리라 <slug>.<dept_slug>.t<N>). line: self=자체개발 / outsource=외주 / service=운영용역 / own=자사작. 팩 소유 콘텐츠 결정, 정렬·해금 참조에 무영향.",
+    "note_stat_map": "부서 주/부 스탯 매핑은 팩 소유 콘텐츠 결정(game-design §6.2). 영업부 sales·기획(퍼블리싱=영업 주도, 딜 구조 기획 보조) / 개발부 제작·기획(제작 주도, 게임 기획 보조) / 라이브운영부 기획·제작(운영·콘텐츠 기획 주도, 패치 구현 제작 보조). 각 부서 주 스탯 1종씩 배타.",
+    "note_liveops_own_reward": "라이브운영 B 자사작 운영은 일시 보상 소액(game-design §12.3) — 값은 tail_refresh 효과에 있음. balance 미정이라 base_reward=TODO:balance."
+  },
+  "todo_token": "TODO:balance",
+
+  "industry_def": {
+    "id": "gamedev",
+    "slug": "gamedev",
+    "name_key": "catalog.gamedev.industry_def.name",
+    "flavor_key": "catalog.gamedev.industry_def.flavor",
+    "positioning": {
+      "duration": "longest",
+      "feedback_loop": "delayed",
+      "variance": "highest",
+      "upfront": "large",
+      "key_decision": "cashflow_survival",
+      "key_decision_key": "catalog.gamedev.industry_def.key_decision"
+    }
+  },
+
+  "stat_weights": { "w_main": 1.0, "w_sub": 0.4 },
+
+  "dept_types": [
+    {
+      "id": "gamedev.sales",
+      "slug": "sales",
+      "name_key": "dept.sales",
+      "common": true,
+      "main_stat": "sales",
+      "sub_stat": "planning"
+    },
+    {
+      "id": "gamedev.dev",
+      "slug": "dev",
+      "name_key": "dept.dev",
+      "common": false,
+      "main_stat": "production",
+      "sub_stat": "planning"
+    },
+    {
+      "id": "gamedev.liveops",
+      "slug": "liveops",
+      "name_key": "dept.liveops",
+      "common": false,
+      "main_stat": "planning",
+      "sub_stat": "production"
+    }
+  ],
+
+  "interpretation_params": {
+    "market_price": null,
+    "line_decay": null,
+
+    "performance_grade": {
+      "formula_ref": "mechanics-spec.md §7.3 : y = clamp(q_raw + sigma_hit*(u - FP/2)/FP*2, 0, FP); u = uniform01_fp(HIT, project_id); Q = bucket(y; d_c1 < d_c2 < d_c3)",
+      "note": "출시형(개발부 자체개발) 완료 시 흥행 롤(HIT 카운터, 게임 내 유일 대형 결과 RNG). q_raw가 기대값, sigma_hit이 분산. 결과 Q는 상태 저장 후 재롤 금지.",
+      "sigma_hit": 0.35,
+      "cut_points": { "d_c1": 0.30, "d_c2": 0.55, "d_c3": 0.80 },
+      "grades": [
+        { "id": "flop",    "order": 0, "name_key": "perf.flop",    "cash_coef": 0.35 },
+        { "id": "modest",  "order": 1, "name_key": "perf.modest",  "cash_coef": 1.00 },
+        { "id": "success", "order": 2, "name_key": "perf.success", "cash_coef": 2.20 },
+        { "id": "hit",     "order": 3, "name_key": "perf.hit",     "cash_coef": 4.50 }
+      ],
+      "cash_coef_note": "일시 자금 = R_base × q(Q). q(Q) = cash_coef. balance §4.2."
+    },
+
+    "tail_schedule": {
+      "formula_ref": "mechanics-spec.md §7.3 : D_tail(Q)일, daily(i) = T_total(Q)*omega_i, omega_i ∝ decay_base^i (정규화 Σomega=FP), 정수화는 최대 잉여법(Σ daily = T_total 보장)",
+      "note": "출시 꼬리. D_tail·T_total은 Q에 단조 증가, 경과일 지급량은 단조 감소. 꼬리는 회사 귀속, 팀은 완료 즉시 해방. 자율 태그 시 꼬리에도 α_auto 적용. 회사 소멸 시 잔여 꼬리 소멸.",
+      "decay_base": 0.93,
+      "total_base_ref": "R_base = 개발부 자체개발 프로젝트의 base_reward",
+      "by_grade": {
+        "flop":    { "d_tail_days": 0,  "total_mult": 0.00 },
+        "modest":  { "d_tail_days": 20, "total_mult": 0.80 },
+        "success": { "d_tail_days": 40, "total_mult": 2.00 },
+        "hit":     { "d_tail_days": 70, "total_mult": 4.00 }
+      },
+      "max_refresh_per_release": 3,
+      "refresh_target_rule_ref": "game-design.md §8.3 : 직접 하달=착수 시 플레이어 1개 지정(활성 대상 없으면 착수 거부), 자율=잔여 꼬리 기간 최단 출시작(동률 시 완료 오래된 순). 대상은 착수 시 고정. 규칙은 코어 소유, 팩 재정의 없음."
+    },
+
+    "unlock_graph": {
+      "note": "게임개발 해금 술어. unlock enum은 각 항목의 재잠김 가능 기본 술어(동적 상태)를 명명하고, 본 그래프가 착수 시점 평가되는 완전 술어(연언 all_of)의 정본이다. 동적 상태 술어는 근거 상태 소멸(전 꼬리 소진) 시 재잠김, 완료 이력 술어는 비가역.",
+      "predicates": {
+        "gamedev.liveops.own.t1": {
+          "all_of": [
+            { "predicate": "dynamic_state", "state": "active_tail_release_exists", "relockable": true }
+          ]
+        },
+        "gamedev.liveops.own.t2": {
+          "all_of": [
+            { "predicate": "dynamic_state", "state": "active_tail_release_exists", "relockable": true }
+          ]
+        },
+        "gamedev.liveops.own.t3": {
+          "all_of": [
+            { "predicate": "dynamic_state", "state": "active_tail_release_exists", "relockable": true },
+            { "predicate": "completion_history", "target_category": "gamedev.dev.self", "min_perf_grade": "success", "irreversible": true }
+          ]
+        }
+      },
+      "predicate_defs": {
+        "dynamic_state": "활성 꼬리 보유 자사 출시작이 회사에 존재(경제 꼬리 스케줄 remaining_days 조회). game-design §8.3.",
+        "completion_history": "target_category 라인에서 성과 등급 ≥ min_perf_grade 인 완료 이력 존재. 비가역. game-design §8.3, §12.3."
+      }
+    }
+  },
+
+  "staple_request": {
+    "catalog_id": "gamedev.staple",
+    "name_key": "mechanic.standing_job",
+    "flavor_key": "catalog.gamedev.staple.flavor",
+    "applies_to": ["gamedev.sales", "gamedev.dev", "gamedev.liveops"],
+    "tier": "T1",
+    "difficulty": "low",
+    "work": 390,
+    "std_days": 5,
+    "base_reward": 60000,
+    "rep_reward": 8,
+    "xp_pool": 60,
+    "posting_ttl": null,
+    "is_staple": true,
+    "ext": {
+      "c0": 0,
+      "commodity_group": null,
+      "coefficient_source": "fixed",
+      "reward_schedule": "lump",
+      "unlock": "none",
+      "completion_effect": "none",
+      "repeatable": "repeat"
+    }
+  },
+
+  "catalog": [
+    {
+      "catalog_id": "gamedev.sales.t1",
+      "dept_type": "gamedev.sales",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.sales.t1.name",
+      "flavor_key": "catalog.gamedev.sales.t1.flavor",
+      "work": 600,
+      "std_days": 6,
+      "base_reward": 180000,
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.sales.t2",
+      "dept_type": "gamedev.sales",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.sales.t2.name",
+      "flavor_key": "catalog.gamedev.sales.t2.flavor",
+      "work": 1500,
+      "std_days": 12,
+      "base_reward": 420000,
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.sales.t3",
+      "dept_type": "gamedev.sales",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.sales.t3.name",
+      "flavor_key": "catalog.gamedev.sales.t3.flavor",
+      "work": 3200,
+      "std_days": 20,
+      "base_reward": 950000,
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": 9,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.sales.t4",
+      "dept_type": "gamedev.sales",
+      "tier": "T4",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.sales.t4.name",
+      "flavor_key": "catalog.gamedev.sales.t4.flavor",
+      "work": 6000,
+      "std_days": 32,
+      "base_reward": 2100000,
+      "rep_reward": 340,
+      "xp_pool": 1600,
+      "posting_ttl": 12,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+
+    {
+      "catalog_id": "gamedev.dev.self.t1",
+      "dept_type": "gamedev.dev",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.dev.self.t1.name",
+      "flavor_key": "catalog.gamedev.dev.self.t1.flavor",
+      "work": 600,
+      "std_days": 11,
+      "base_reward": 180000,
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "performance_grade",
+        "reward_schedule": "lump_plus_tail",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.dev.self.t2",
+      "dept_type": "gamedev.dev",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.dev.self.t2.name",
+      "flavor_key": "catalog.gamedev.dev.self.t2.flavor",
+      "work": 1500,
+      "std_days": 22,
+      "base_reward": 420000,
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "performance_grade",
+        "reward_schedule": "lump_plus_tail",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.dev.self.t3",
+      "dept_type": "gamedev.dev",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.dev.self.t3.name",
+      "flavor_key": "catalog.gamedev.dev.self.t3.flavor",
+      "work": 3200,
+      "std_days": 36,
+      "base_reward": 950000,
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": 9,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "performance_grade",
+        "reward_schedule": "lump_plus_tail",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.dev.self.t4",
+      "dept_type": "gamedev.dev",
+      "tier": "T4",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.dev.self.t4.name",
+      "flavor_key": "catalog.gamedev.dev.self.t4.flavor",
+      "work": 6000,
+      "std_days": 58,
+      "base_reward": 2100000,
+      "rep_reward": 340,
+      "xp_pool": 1600,
+      "posting_ttl": 12,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "performance_grade",
+        "reward_schedule": "lump_plus_tail",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.dev.self.t5",
+      "dept_type": "gamedev.dev",
+      "tier": "T5",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.dev.self.t5.name",
+      "flavor_key": "catalog.gamedev.dev.self.t5.flavor",
+      "work": 10000,
+      "std_days": 86,
+      "base_reward": 4500000,
+      "rep_reward": 800,
+      "xp_pool": 3400,
+      "posting_ttl": 12,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "performance_grade",
+        "reward_schedule": "lump_plus_tail",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+
+    {
+      "catalog_id": "gamedev.dev.outsource.t1",
+      "dept_type": "gamedev.dev",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.dev.outsource.t1.name",
+      "flavor_key": "catalog.gamedev.dev.outsource.t1.flavor",
+      "work": 600,
+      "std_days": 11,
+      "base_reward": 180000,
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.dev.outsource.t2",
+      "dept_type": "gamedev.dev",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.dev.outsource.t2.name",
+      "flavor_key": "catalog.gamedev.dev.outsource.t2.flavor",
+      "work": 1500,
+      "std_days": 22,
+      "base_reward": 420000,
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.dev.outsource.t3",
+      "dept_type": "gamedev.dev",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.dev.outsource.t3.name",
+      "flavor_key": "catalog.gamedev.dev.outsource.t3.flavor",
+      "work": 3200,
+      "std_days": 36,
+      "base_reward": 950000,
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": 9,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+
+    {
+      "catalog_id": "gamedev.liveops.service.t1",
+      "dept_type": "gamedev.liveops",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.liveops.service.t1.name",
+      "flavor_key": "catalog.gamedev.liveops.service.t1.flavor",
+      "work": 600,
+      "std_days": 6,
+      "base_reward": 180000,
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.liveops.service.t2",
+      "dept_type": "gamedev.liveops",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.liveops.service.t2.name",
+      "flavor_key": "catalog.gamedev.liveops.service.t2.flavor",
+      "work": 1500,
+      "std_days": 12,
+      "base_reward": 420000,
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.liveops.service.t3",
+      "dept_type": "gamedev.liveops",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.liveops.service.t3.name",
+      "flavor_key": "catalog.gamedev.liveops.service.t3.flavor",
+      "work": 3200,
+      "std_days": 20,
+      "base_reward": 950000,
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": 9,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+
+    {
+      "catalog_id": "gamedev.liveops.own.t1",
+      "dept_type": "gamedev.liveops",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.liveops.own.t1.name",
+      "flavor_key": "catalog.gamedev.liveops.own.t1.flavor",
+      "work": 600,
+      "std_days": 6,
+      "base_reward": "TODO:balance",
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "dynamic_state",
+        "completion_effect": "tail_refresh",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.liveops.own.t2",
+      "dept_type": "gamedev.liveops",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.liveops.own.t2.name",
+      "flavor_key": "catalog.gamedev.liveops.own.t2.flavor",
+      "work": 1500,
+      "std_days": 12,
+      "base_reward": "TODO:balance",
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": 6,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "dynamic_state",
+        "completion_effect": "tail_refresh",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "gamedev.liveops.own.t3",
+      "dept_type": "gamedev.liveops",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.gamedev.liveops.own.t3.name",
+      "flavor_key": "catalog.gamedev.liveops.own.t3.flavor",
+      "work": 3200,
+      "std_days": 20,
+      "base_reward": "TODO:balance",
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": 9,
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "dynamic_state",
+        "completion_effect": "tail_refresh",
+        "repeatable": "repeat"
+      }
+    }
+  ],
+
+  "economy": {
+    "c_seed": 6000000,
+    "f_found": 9000000,
+    "f_found_g": 900
+  }
+}
