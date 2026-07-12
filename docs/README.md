@@ -24,6 +24,21 @@
 
 > **범위 경계:** `game-design.md`는 "게임 규칙이 무엇인가"만 다룬다(수치·구현·표현 배제). 본 세트의 나머지 문서가 그 배제 영역 — 표현(아트/사운드/UX), 구현(기술/밸런스 수치), 사업(수익화/마케팅), 운영(라이브옵스/QA/리스크) — 을 채운다. 규칙 자체를 바꾸는 결정은 반드시 `game-design.md` 개정으로 선행한다.
 
+### 제작·계획 산출물 (파트 문서에서 파생)
+
+| 문서/데이터 | 내용 | 파생 |
+|---|---|---|
+| [roadmap-milestones.md](./roadmap-milestones.md) | 사업 마일스톤 마스터 플랜(M1~M8, Phase·SubTask) | production-qa-risk |
+| [decision-log.md](./decision-log.md) | 확정/미결/플레이테스트 결정 통합 추적 | 전체 |
+| [tech-spikes-and-decisions.md](./tech-spikes-and-decisions.md) | 엔진·동결 3종 스파이크 결정 지원(D-102~105) | technical-architecture |
+| [m2-prototype-spec.md](./m2-prototype-spec.md) | M2 프로토타입 착수 스펙(31티켓·테스트) | mechanics-spec |
+| [server-api-and-pipeline.md](./server-api-and-pipeline.md) | 서버 API 계약 + 데이터 파이프라인 | technical-architecture |
+| [content-schema.md](./content-schema.md) | 콘텐츠 팩 데이터 포맷 스키마 | mechanics-spec |
+| [design-tokens.md](./design-tokens.md) | 색 토큰 v0(HEX·대비 검증) | art-direction |
+| [localization/](./localization/) | 문자열 키 규약·용어집 | accessibility-localization |
+| `data/content/{trading,gamedev,cosmetics}.json` | 3업종 콘텐츠 팩 인스턴스 | content-schema |
+| `data/localization/strings.sample.json` | 스타터 ko/en 문자열 | localization |
+
 ---
 
 ## 1. 설계 전제 (Design Premises)
