@@ -1,0 +1,613 @@
+{
+  "schema_version": "1.0.0",
+  "pack_id": "cosmetics",
+  "pack_version": "1.0.0",
+  "refs": {
+    "catalog": "game-design.md §12.4",
+    "schema": "content-schema.md v1.0, mechanics-spec.md §8.3, §10.1, §10.6",
+    "mechanic": "라인 감쇠 δ(n) [MS §7.4], 해금 그래프(완료이력 술어) [GD §8.3, MS §8.5]",
+    "balance": "balance.md §4.1, §5.1, §5.3, §6.2 (튜닝 1차안)",
+    "locale": "docs/localization/string-key-convention.md §4.1, glossary.md §6",
+    "notes": {
+      "reward_baseline": "고정 계수 카테고리(영업부 판로·R&D B 수탁용역)의 base_reward = balance §4.1 기준 테이블 M(난이도 중)에 화장품 산업 배율(§5.1: D_std ×1.00, M 별도 배율 미지정 → ×1.00 항등) 적용. W/rep_reward/xp_pool은 산업 배율 없음(무역 팩 선례).",
+      "rnd_duration": "balance §5.1은 화장품 D_std ×1.00만 명시하고 'R&D만 김'을 정량화하지 않음 — R&D의 '길다'는 감각은 std_days 오버라이드가 아니라 해금 체인 피드백 루프(§12.4·positioning.feedback_loop=mid_term)로 표현. R&D 전용 기간 배율 도입은 balance 미확정(§ TODO 참고).",
+      "rnd_A_weighting": "R&D A 제품라인개발은 '자금 보상 미미·XP·명성 가중'(§12.4). base_reward·c0는 정량치 미제공 → TODO:balance. rep_reward/xp_pool은 기준 테이블 값을 사용하되 의도된 >기준 가중 배율은 balance 미확정(정량화 필요).",
+      "id_extension": "화장품 부서는 부서당 복수 프로젝트 라인을 가지므로(R&D A/B, 생산 A/B) catalog_id·로케일 키를 <slug>.<dept>.<category>.t<N> 5세그먼트로 확장. 무역 팩의 <slug>.<dept>.t<N>(부서당 1라인)의 일반화이며 스키마 §10 정렬 규약과 정합(catalog_id 오름차순).",
+      "own_line_anchor": "자사 라인 T1만 balance §5.3 명시(M_line=300,000, C₀=90,000, 하한 마진 300,000·0.35−90,000=+15,000≥0 가드레일 7 ✓). T2~T4 커브 미확정 → TODO:balance."
+    }
+  },
+  "todo_token": "TODO:balance",
+
+  "industry_def": {
+    "id": "cosmetics",
+    "slug": "cosmetics",
+    "name_key": "catalog.cosmetics.industry_def.name",
+    "flavor_key": "catalog.cosmetics.industry_def.flavor",
+    "positioning": {
+      "duration": "medium",
+      "feedback_loop": "mid_term",
+      "variance": "low",
+      "upfront": "mid",
+      "key_decision": "reinvestment_cycle",
+      "key_decision_key": "catalog.cosmetics.industry_def.key_decision"
+    }
+  },
+
+  "stat_weights": { "w_main": 1.0, "w_sub": 0.4 },
+
+  "dept_types": [
+    {
+      "id": "cosmetics.sales",
+      "slug": "sales",
+      "name_key": "dept.sales",
+      "common": true,
+      "main_stat": "sales",
+      "sub_stat": "planning"
+    },
+    {
+      "id": "cosmetics.rnd",
+      "slug": "rnd",
+      "name_key": "dept.rnd",
+      "common": false,
+      "main_stat": "planning",
+      "sub_stat": "production"
+    },
+    {
+      "id": "cosmetics.production",
+      "slug": "production",
+      "name_key": "dept.production",
+      "common": false,
+      "main_stat": "production",
+      "sub_stat": "planning"
+    }
+  ],
+
+  "interpretation_params": {
+    "market_price": null,
+    "tail_schedule": null,
+    "line_decay": {
+      "formula_ref": "mechanics-spec.md §7.4 : delta(n) = delta_min + (1 - delta_min) * zeta^n, n = 자사 라인 template별 누적 완료 카운터",
+      "note": "라인 감쇠 계수. coefficient_source=line_decay(생산부 B 자사 라인)에만 적용. 자금 보상 = M(t) * delta(n). 하한 delta_min>0 수렴 → 구작 라인 비휘발(해금 자산 보존), 신제품 유인은 신규 라인과의 상대 격차로. balance §5.3. δ 예: n0=1.000 / n1=0.883 / n3=0.708 / n5=0.593 / n→∞=0.350.",
+      "delta_min": 0.35,
+      "zeta": 0.82
+    },
+    "performance_grade": null,
+    "unlock_graph": {
+      "predicate_kind": "completion_history",
+      "note": "완료이력 술어(비가역). 화장품 해금: R&D A '제품 라인 개발' 완료가 (1) 다음 R&D 단계의 선행조건 체인(직전 단계 완료 필요) (2) 대응 생산부 B '자사 라인 생산·판매' 해금(completion_effect=unlock). 라인 4종(기초→색조→기능성→프리미엄) 순차 해금. 판정은 선택가능식(§8.5)의 '해금 조건 충족' 항에서 착수 시점마다 평가. 성과 문턱 미사용(min_perf_grade=null).",
+      "unlock_conditions": {
+        "cosmetics.rnd.line_dev.t2": { "predicate": "completion_history", "target": "cosmetics.rnd.line_dev.t1", "min_perf_grade": null },
+        "cosmetics.rnd.line_dev.t3": { "predicate": "completion_history", "target": "cosmetics.rnd.line_dev.t2", "min_perf_grade": null },
+        "cosmetics.rnd.line_dev.t4": { "predicate": "completion_history", "target": "cosmetics.rnd.line_dev.t3", "min_perf_grade": null },
+        "cosmetics.production.own_line.t1": { "predicate": "completion_history", "target": "cosmetics.rnd.line_dev.t1", "min_perf_grade": null },
+        "cosmetics.production.own_line.t2": { "predicate": "completion_history", "target": "cosmetics.rnd.line_dev.t2", "min_perf_grade": null },
+        "cosmetics.production.own_line.t3": { "predicate": "completion_history", "target": "cosmetics.rnd.line_dev.t3", "min_perf_grade": null },
+        "cosmetics.production.own_line.t4": { "predicate": "completion_history", "target": "cosmetics.rnd.line_dev.t4", "min_perf_grade": null }
+      },
+      "completion_effects": {
+        "cosmetics.rnd.line_dev.t1": { "effect": "unlock", "targets": ["cosmetics.production.own_line.t1", "cosmetics.rnd.line_dev.t2"] },
+        "cosmetics.rnd.line_dev.t2": { "effect": "unlock", "targets": ["cosmetics.production.own_line.t2", "cosmetics.rnd.line_dev.t3"] },
+        "cosmetics.rnd.line_dev.t3": { "effect": "unlock", "targets": ["cosmetics.production.own_line.t3", "cosmetics.rnd.line_dev.t4"] },
+        "cosmetics.rnd.line_dev.t4": { "effect": "unlock", "targets": ["cosmetics.production.own_line.t4"] }
+      }
+    }
+  },
+
+  "staple_request": {
+    "catalog_id": "cosmetics.staple",
+    "name_key": "mechanic.standing_job",
+    "flavor_key": "catalog.cosmetics.staple.flavor",
+    "applies_to": ["cosmetics.sales", "cosmetics.rnd", "cosmetics.production"],
+    "tier": "T1",
+    "difficulty": "low",
+    "work": 390,
+    "std_days": 5,
+    "base_reward": 60000,
+    "rep_reward": 8,
+    "xp_pool": 60,
+    "posting_ttl": null,
+    "is_staple": true,
+    "ext": {
+      "c0": 0,
+      "commodity_group": null,
+      "coefficient_source": "fixed",
+      "reward_schedule": "lump",
+      "unlock": "none",
+      "completion_effect": "none",
+      "repeatable": "repeat"
+    }
+  },
+
+  "catalog": [
+    {
+      "catalog_id": "cosmetics.sales.t1",
+      "dept_type": "cosmetics.sales",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.sales.t1.name",
+      "flavor_key": "catalog.cosmetics.sales.t1.flavor",
+      "work": 600,
+      "std_days": 6,
+      "base_reward": 180000,
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.sales.t2",
+      "dept_type": "cosmetics.sales",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.sales.t2.name",
+      "flavor_key": "catalog.cosmetics.sales.t2.flavor",
+      "work": 1500,
+      "std_days": 12,
+      "base_reward": 420000,
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.sales.t3",
+      "dept_type": "cosmetics.sales",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.sales.t3.name",
+      "flavor_key": "catalog.cosmetics.sales.t3.flavor",
+      "work": 3200,
+      "std_days": 20,
+      "base_reward": 950000,
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.sales.t4",
+      "dept_type": "cosmetics.sales",
+      "tier": "T4",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.sales.t4.name",
+      "flavor_key": "catalog.cosmetics.sales.t4.flavor",
+      "work": 6000,
+      "std_days": 32,
+      "base_reward": 2100000,
+      "rep_reward": 340,
+      "xp_pool": 1600,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.sales.t5",
+      "dept_type": "cosmetics.sales",
+      "tier": "T5",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.sales.t5.name",
+      "flavor_key": "catalog.cosmetics.sales.t5.flavor",
+      "work": 10000,
+      "std_days": 48,
+      "base_reward": 4500000,
+      "rep_reward": 800,
+      "xp_pool": 3400,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+
+    {
+      "catalog_id": "cosmetics.rnd.line_dev.t1",
+      "dept_type": "cosmetics.rnd",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.rnd.line_dev.t1.name",
+      "flavor_key": "catalog.cosmetics.rnd.line_dev.t1.flavor",
+      "work": 600,
+      "std_days": 6,
+      "base_reward": "TODO:balance",
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": "TODO:balance",
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "unlock",
+        "repeatable": "one_shot"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.rnd.line_dev.t2",
+      "dept_type": "cosmetics.rnd",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.rnd.line_dev.t2.name",
+      "flavor_key": "catalog.cosmetics.rnd.line_dev.t2.flavor",
+      "work": 1500,
+      "std_days": 12,
+      "base_reward": "TODO:balance",
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": "TODO:balance",
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "completion_history",
+        "completion_effect": "unlock",
+        "repeatable": "one_shot"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.rnd.line_dev.t3",
+      "dept_type": "cosmetics.rnd",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.rnd.line_dev.t3.name",
+      "flavor_key": "catalog.cosmetics.rnd.line_dev.t3.flavor",
+      "work": 3200,
+      "std_days": 20,
+      "base_reward": "TODO:balance",
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": "TODO:balance",
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "completion_history",
+        "completion_effect": "unlock",
+        "repeatable": "one_shot"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.rnd.line_dev.t4",
+      "dept_type": "cosmetics.rnd",
+      "tier": "T4",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.rnd.line_dev.t4.name",
+      "flavor_key": "catalog.cosmetics.rnd.line_dev.t4.flavor",
+      "work": 6000,
+      "std_days": 32,
+      "base_reward": "TODO:balance",
+      "rep_reward": 340,
+      "xp_pool": 1600,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": "TODO:balance",
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "completion_history",
+        "completion_effect": "unlock",
+        "repeatable": "one_shot"
+      }
+    },
+
+    {
+      "catalog_id": "cosmetics.rnd.contract.t1",
+      "dept_type": "cosmetics.rnd",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.rnd.contract.t1.name",
+      "flavor_key": "catalog.cosmetics.rnd.contract.t1.flavor",
+      "work": 600,
+      "std_days": 6,
+      "base_reward": 180000,
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.rnd.contract.t2",
+      "dept_type": "cosmetics.rnd",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.rnd.contract.t2.name",
+      "flavor_key": "catalog.cosmetics.rnd.contract.t2.flavor",
+      "work": 1500,
+      "std_days": 12,
+      "base_reward": 420000,
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.rnd.contract.t3",
+      "dept_type": "cosmetics.rnd",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.rnd.contract.t3.name",
+      "flavor_key": "catalog.cosmetics.rnd.contract.t3.flavor",
+      "work": 3200,
+      "std_days": 20,
+      "base_reward": 950000,
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+
+    {
+      "catalog_id": "cosmetics.production.oem.t1",
+      "dept_type": "cosmetics.production",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.production.oem.t1.name",
+      "flavor_key": "catalog.cosmetics.production.oem.t1.flavor",
+      "work": 600,
+      "std_days": 6,
+      "base_reward": "TODO:balance",
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.production.oem.t2",
+      "dept_type": "cosmetics.production",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.production.oem.t2.name",
+      "flavor_key": "catalog.cosmetics.production.oem.t2.flavor",
+      "work": 1500,
+      "std_days": 12,
+      "base_reward": "TODO:balance",
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.production.oem.t3",
+      "dept_type": "cosmetics.production",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.production.oem.t3.name",
+      "flavor_key": "catalog.cosmetics.production.oem.t3.flavor",
+      "work": 3200,
+      "std_days": 20,
+      "base_reward": "TODO:balance",
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.production.oem.t4",
+      "dept_type": "cosmetics.production",
+      "tier": "T4",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.production.oem.t4.name",
+      "flavor_key": "catalog.cosmetics.production.oem.t4.flavor",
+      "work": 6000,
+      "std_days": 32,
+      "base_reward": "TODO:balance",
+      "rep_reward": 340,
+      "xp_pool": 1600,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 0,
+        "commodity_group": null,
+        "coefficient_source": "fixed",
+        "reward_schedule": "lump",
+        "unlock": "none",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+
+    {
+      "catalog_id": "cosmetics.production.own_line.t1",
+      "dept_type": "cosmetics.production",
+      "tier": "T1",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.production.own_line.t1.name",
+      "flavor_key": "catalog.cosmetics.production.own_line.t1.flavor",
+      "work": 600,
+      "std_days": 6,
+      "base_reward": 300000,
+      "rep_reward": 20,
+      "xp_pool": 120,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": 90000,
+        "commodity_group": null,
+        "coefficient_source": "line_decay",
+        "reward_schedule": "lump",
+        "unlock": "completion_history",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.production.own_line.t2",
+      "dept_type": "cosmetics.production",
+      "tier": "T2",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.production.own_line.t2.name",
+      "flavor_key": "catalog.cosmetics.production.own_line.t2.flavor",
+      "work": 1500,
+      "std_days": 12,
+      "base_reward": "TODO:balance",
+      "rep_reward": 55,
+      "xp_pool": 300,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": "TODO:balance",
+        "commodity_group": null,
+        "coefficient_source": "line_decay",
+        "reward_schedule": "lump",
+        "unlock": "completion_history",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.production.own_line.t3",
+      "dept_type": "cosmetics.production",
+      "tier": "T3",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.production.own_line.t3.name",
+      "flavor_key": "catalog.cosmetics.production.own_line.t3.flavor",
+      "work": 3200,
+      "std_days": 20,
+      "base_reward": "TODO:balance",
+      "rep_reward": 140,
+      "xp_pool": 720,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": "TODO:balance",
+        "commodity_group": null,
+        "coefficient_source": "line_decay",
+        "reward_schedule": "lump",
+        "unlock": "completion_history",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    },
+    {
+      "catalog_id": "cosmetics.production.own_line.t4",
+      "dept_type": "cosmetics.production",
+      "tier": "T4",
+      "difficulty": "mid",
+      "name_key": "catalog.cosmetics.production.own_line.t4.name",
+      "flavor_key": "catalog.cosmetics.production.own_line.t4.flavor",
+      "work": 6000,
+      "std_days": 32,
+      "base_reward": "TODO:balance",
+      "rep_reward": 340,
+      "xp_pool": 1600,
+      "posting_ttl": "TODO:balance",
+      "is_staple": false,
+      "ext": {
+        "c0": "TODO:balance",
+        "commodity_group": null,
+        "coefficient_source": "line_decay",
+        "reward_schedule": "lump",
+        "unlock": "completion_history",
+        "completion_effect": "none",
+        "repeatable": "repeat"
+      }
+    }
+  ],
+
+  "economy": {
+    "c_seed": 3500000,
+    "f_found": 5500000,
+    "f_found_g": 550
+  }
+}
