@@ -8,8 +8,6 @@
     "balance": "balance.md §4.1, §5.1, §5.2, §6.2 (튜닝 1차안)",
     "locale": "docs/localization/string-key-convention.md §4, glossary.md"
   },
-  "todo_token": "TODO:balance",
-
   "industry_def": {
     "id": "trade",
     "slug": "trade",
@@ -24,9 +22,10 @@
       "key_decision_key": "catalog.trade.industry_def.key_decision"
     }
   },
-
-  "stat_weights": { "w_main": 1.0, "w_sub": 0.4 },
-
+  "stat_weights": {
+    "w_main": 1.0,
+    "w_sub": 0.4
+  },
   "dept_types": [
     {
       "id": "trade.sales",
@@ -53,7 +52,6 @@
       "sub_stat": "planning"
     }
   ],
-
   "interpretation_params": {
     "market_price": {
       "formula_ref": "mechanics-spec.md §7.4 : mu(g,day) = 1 + amp(g) * sum_j sin(2*pi*day/period_j + phase_j)",
@@ -63,22 +61,42 @@
           "id": "consumer_goods",
           "name_key": "catalog.trade.commodity.consumer_goods.name",
           "amp": 0.08,
-          "periods": [17, 41],
-          "phases": [0, 0]
+          "periods": [
+            17,
+            41
+          ],
+          "phases": [
+            0,
+            0
+          ]
         },
         {
           "id": "raw_materials",
           "name_key": "catalog.trade.commodity.raw_materials.name",
           "amp": 0.15,
-          "periods": [23, 53],
-          "phases": [0, 0]
+          "periods": [
+            23,
+            53
+          ],
+          "phases": [
+            0,
+            0
+          ]
         },
         {
           "id": "electronics",
           "name_key": "catalog.trade.commodity.electronics.name",
           "amp": 0.25,
-          "periods": [13, 29, 61],
-          "phases": [0, 0, 0]
+          "periods": [
+            13,
+            29,
+            61
+          ],
+          "phases": [
+            0,
+            0,
+            0
+          ]
         }
       ]
     },
@@ -87,12 +105,15 @@
     "performance_grade": null,
     "unlock_graph": null
   },
-
   "staple_request": {
     "catalog_id": "trade.staple",
     "name_key": "mechanic.standing_job",
     "flavor_key": "catalog.trade.staple.flavor",
-    "applies_to": ["trade.sales", "trade.sourcing", "trade.logistics"],
+    "applies_to": [
+      "trade.sales",
+      "trade.sourcing",
+      "trade.logistics"
+    ],
     "tier": "T1",
     "difficulty": "low",
     "work": 390,
@@ -112,7 +133,6 @@
       "repeatable": "repeat"
     }
   },
-
   "catalog": [
     {
       "catalog_id": "trade.sales.t1",
@@ -126,7 +146,7 @@
       "base_reward": 162000,
       "rep_reward": 20,
       "xp_pool": 120,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 6,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -150,7 +170,7 @@
       "base_reward": 378000,
       "rep_reward": 55,
       "xp_pool": 300,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 6,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -174,7 +194,7 @@
       "base_reward": 855000,
       "rep_reward": 140,
       "xp_pool": 720,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 9,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -198,7 +218,7 @@
       "base_reward": 1890000,
       "rep_reward": 340,
       "xp_pool": 1600,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 12,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -222,7 +242,7 @@
       "base_reward": 4050000,
       "rep_reward": 800,
       "xp_pool": 3400,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 12,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -234,7 +254,6 @@
         "repeatable": "repeat"
       }
     },
-
     {
       "catalog_id": "trade.sourcing.t1",
       "dept_type": "trade.sourcing",
@@ -247,7 +266,7 @@
       "base_reward": 200000,
       "rep_reward": 20,
       "xp_pool": 120,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 6,
       "is_staple": false,
       "ext": {
         "c0": 120000,
@@ -268,13 +287,13 @@
       "flavor_key": "catalog.trade.sourcing.t2.flavor",
       "work": 1500,
       "std_days": 7,
-      "base_reward": "TODO:balance",
+      "base_reward": 470000,
       "rep_reward": 55,
       "xp_pool": 300,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 6,
       "is_staple": false,
       "ext": {
-        "c0": "TODO:balance",
+        "c0": 280000,
         "commodity_group": "consumer_goods",
         "coefficient_source": "market_price",
         "reward_schedule": "lump",
@@ -292,13 +311,13 @@
       "flavor_key": "catalog.trade.sourcing.t3.flavor",
       "work": 3200,
       "std_days": 12,
-      "base_reward": "TODO:balance",
+      "base_reward": 1060000,
       "rep_reward": 140,
       "xp_pool": 720,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 9,
       "is_staple": false,
       "ext": {
-        "c0": "TODO:balance",
+        "c0": 636000,
         "commodity_group": "raw_materials",
         "coefficient_source": "market_price",
         "reward_schedule": "lump",
@@ -316,13 +335,13 @@
       "flavor_key": "catalog.trade.sourcing.t4.flavor",
       "work": 6000,
       "std_days": 19,
-      "base_reward": "TODO:balance",
+      "base_reward": 2330000,
       "rep_reward": 340,
       "xp_pool": 1600,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 12,
       "is_staple": false,
       "ext": {
-        "c0": "TODO:balance",
+        "c0": 1400000,
         "commodity_group": "electronics",
         "coefficient_source": "market_price",
         "reward_schedule": "lump",
@@ -340,13 +359,13 @@
       "flavor_key": "catalog.trade.sourcing.t5.flavor",
       "work": 10000,
       "std_days": 29,
-      "base_reward": "TODO:balance",
+      "base_reward": 5000000,
       "rep_reward": 800,
       "xp_pool": 3400,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 12,
       "is_staple": false,
       "ext": {
-        "c0": "TODO:balance",
+        "c0": 3000000,
         "commodity_group": "raw_materials",
         "coefficient_source": "market_price",
         "reward_schedule": "lump",
@@ -355,7 +374,6 @@
         "repeatable": "repeat"
       }
     },
-
     {
       "catalog_id": "trade.logistics.t1",
       "dept_type": "trade.logistics",
@@ -368,7 +386,7 @@
       "base_reward": 162000,
       "rep_reward": 20,
       "xp_pool": 120,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 6,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -392,7 +410,7 @@
       "base_reward": 378000,
       "rep_reward": 55,
       "xp_pool": 300,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 6,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -416,7 +434,7 @@
       "base_reward": 855000,
       "rep_reward": 140,
       "xp_pool": 720,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 9,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -440,7 +458,7 @@
       "base_reward": 1890000,
       "rep_reward": 340,
       "xp_pool": 1600,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 12,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -464,7 +482,7 @@
       "base_reward": 4050000,
       "rep_reward": 800,
       "xp_pool": 3400,
-      "posting_ttl": "TODO:balance",
+      "posting_ttl": 12,
       "is_staple": false,
       "ext": {
         "c0": 0,
@@ -477,7 +495,6 @@
       }
     }
   ],
-
   "economy": {
     "c_seed": 2000000,
     "f_found": 3500000,
