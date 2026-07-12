@@ -1,0 +1,203 @@
+{
+  "_meta": {
+    "purpose": "M1 SubTask 1.4.2 스타터 문자열 테이블 (대표 슬라이스 ko/en). 전량 문자열 아님 — 온보딩 M1~M6, 코어 루프 라벨, 리아 대사, 자원/재무 라벨, 알림, 확인/취소 대표 슬라이스.",
+    "authority": "키 규약=docs/localization/string-key-convention.md, 용어=docs/localization/glossary.md(정본 game-design §4), 톤=narrative-tone.md(리아 단일 화자)",
+    "keyFormat": "<surface>.<context>.<identifier>[.<sub>]",
+    "locales": ["ko", "en"],
+    "fallbackLocale": "en",
+    "expansionLocales": ["ja", "zh-Hans"],
+    "format": "ICU MessageFormat",
+    "fields": {
+      "surface": "ux 화면 코드 S0~S21 또는 표면",
+      "speaker": "ria | system | none",
+      "budget": "notif | label | flavor | tooltip | onboarding | report | milestone | ending (string-key-convention §6)",
+      "transcreation": "true=플레이버 적응 / false=기능 직역",
+      "vars": "ICU 변수 슬롯",
+      "note": "컨텍스트/뉘앙스 노트"
+    },
+    "iconTokens": "재화 아이콘은 렌더 계층이 주입(§8.6). 값에 하드 글리프(₩) 금지, 수치만 삽입."
+  },
+
+  "strings": {
+
+    "onboarding.m1.hire": {
+      "ko": "사람이 곧 회사예요, 대표님. 카드의 등급은 '앞으로 얼마나 클 수 있는지'예요. 마음에 드는 분을 모셔볼까요?",
+      "en": "People are the company, Chief. That grade on the card is how much they can grow — not what they are today. Shall we bring someone in?",
+      "surface": "S5", "speaker": "ria", "budget": "onboarding", "transcreation": false,
+      "note": "M1 첫 채용. 개념 재프레이밍 '등급=잠재력'을 여기서 심음(narrative §6.1)."
+    },
+    "onboarding.m2.team": {
+      "ko": "팀장은 리더십만 갖추면 돼요. 팀장이 있어야 일을 시작할 수 있습니다.",
+      "en": "A team lead only needs Leadership. No lead, no work can start.",
+      "surface": "S4", "speaker": "ria", "budget": "onboarding", "transcreation": false,
+      "note": "M2 첫 팀 편성."
+    },
+    "onboarding.m3.dispatch": {
+      "ko": "의뢰 보드에서 일감을 골라 팀에 맡기세요. 이게 우리의 밥벌이입니다.",
+      "en": "Pick a job from the board and hand it to a team. This is how we earn our keep.",
+      "surface": "S6", "speaker": "ria", "budget": "onboarding", "transcreation": false,
+      "note": "M3 첫 하달(직접 하달)."
+    },
+    "onboarding.m4.complete": {
+      "ko": "첫 수익이에요! 봤죠? 이렇게 굴러가는 겁니다.",
+      "en": "Our first earnings! See? This is how it turns.",
+      "surface": "S7", "speaker": "ria", "budget": "onboarding", "transcreation": false,
+      "note": "M4 첫 완료. 작은 축하."
+    },
+    "onboarding.m5.payroll": {
+      "ko": "월급, 밀리지 않고 다 드렸어요. 이게 제일 중요한 겁니다, 대표님.",
+      "en": "Payroll paid in full, no delays. Nothing matters more than this, Chief.",
+      "surface": "S11", "speaker": "ria", "budget": "onboarding", "transcreation": false,
+      "note": "M5 첫 정산 통과."
+    },
+    "onboarding.m6.train": {
+      "ko": "돈을 들여 실력을 채우는 걸 훈련이라고 해요. 될성부른 사람에게 투자하는 거죠.",
+      "en": "Spending funds to raise a stat is called training. You invest in the ones with promise.",
+      "surface": "S9", "speaker": "ria", "budget": "onboarding", "transcreation": false,
+      "note": "M6 첫 육성."
+    },
+
+    "ui.recruit.confirm": {
+      "ko": "채용", "en": "Hire",
+      "surface": "S5", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "채용 확정 버튼. 계약금 예약 차감. ≤6자. 승급 승인과 키 분리."
+    },
+    "ui.roster.assign": {
+      "ko": "배치", "en": "Assign",
+      "surface": "S4", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "미배치 풀 → 팀 슬롯 배치(탭 대체 경로 포함)."
+    },
+    "ui.board.dispatch": {
+      "ko": "하달", "en": "Dispatch",
+      "surface": "S6", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "게시물→팀 지정→착수(직접 하달)."
+    },
+    "ui.finance.payroll": {
+      "ko": "급여", "en": "Payroll",
+      "surface": "S11", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "결산 리포트 급여 항목 라벨."
+    },
+    "ui.team.promote": {
+      "ko": "승급", "en": "Promote",
+      "surface": "S2", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "회사 등급 승급 예약. 채용 확정과 다른 키."
+    },
+    "ui.training.start": {
+      "ko": "훈련", "en": "Train",
+      "surface": "S9", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "훈련 확정(비용 예약 차감)."
+    },
+
+    "resource.funds.label": {
+      "ko": "자금", "en": "Funds",
+      "surface": "common", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "자금 아이콘 병기. 기호 ₩는 폴백(§8.6). 회사별 원장."
+    },
+    "resource.gold.label": {
+      "ko": "골드", "en": "Gold",
+      "surface": "common", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "경영자 재화. 자금과 교환 불가. 전용 아이콘."
+    },
+    "resource.reputation.label": {
+      "ko": "명성", "en": "Reputation",
+      "surface": "common", "speaker": "none", "budget": "label", "transcreation": false
+    },
+    "status.finance.healthy": {
+      "ko": "건전", "en": "Healthy",
+      "surface": "S2", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "재무 상태 4중 부호 텍스트 라벨(accessibility §2.1)."
+    },
+    "status.finance.caution": {
+      "ko": "주의 · 다음 달 빠듯", "en": "Caution · Next month tight",
+      "surface": "S2", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "경고 오버레이(정식 상태 아님). 매일 갱신 예측."
+    },
+    "status.finance.distressed": {
+      "ko": "부실", "en": "Distressed",
+      "surface": "S2", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "복귀 체크리스트 표시·자진 강등 허용."
+    },
+    "status.finance.bankrupt": {
+      "ko": "파산 임박", "en": "Bankruptcy imminent",
+      "surface": "S2", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "청산과 구분. 조롱·해골 아이콘 금지(narrative §8)."
+    },
+
+    "notif.crisis.unpaid": {
+      "ko": "[{company}] 미지급이 생겼어요. 상비 의뢰부터 돌려보죠.",
+      "en": "[{company}] A payment went unpaid. Let us start with a Standing Job.",
+      "surface": "S18", "speaker": "ria", "budget": "notif", "transcreation": false,
+      "vars": { "company": "회사명(회사 태그)" },
+      "note": "ICU 변수 삽입 예시. 위기 티어. FOMO·긴급 과장 금지. 조사 비의존 문형(§2.4)."
+    },
+    "notif.intervene.captain_empty": {
+      "ko": "[{company}] 팀장 자리가 비었어요. 리더십 있는 분을 앉혀주세요.",
+      "en": "[{company}] A team has no lead. Assign someone with Leadership.",
+      "surface": "S18", "speaker": "ria", "budget": "notif", "transcreation": false,
+      "vars": { "company": "회사명" },
+      "note": "개입 티어. '{company}의 팀장'식 조사 결합 대신 태그+구두점(§2.4)."
+    },
+    "notif.info.idle": {
+      "ko": "[{company}] 개발부가 {days, plural, other {#일째 놀고 있어요.}}",
+      "en": "[{company}] Dev has been idle {days, plural, one {for # day.} other {for # days.}}",
+      "surface": "S18", "speaker": "ria", "budget": "notif", "transcreation": false,
+      "vars": { "company": "회사명", "days": "연속 저가동 일수" },
+      "note": "ICU 복수형(plural) 예시. ko=other만, en=one/other. 정보 티어(푸시 없음)."
+    },
+
+    "event.gamedev.perf_reveal": {
+      "ko": "{q, select, hit {히트작이에요!! 대표님, 이거 대박이에요. 꼬리 수익이 한동안 들어옵니다.} success {성공작이에요. 안정적으로 잘 나왔어요.} modest {평작이에요. 무난하게 넘겼네요.} other {이번엔 조용히 묻혔어요. 배운 게 있으니, 다음에 살리죠.}}",
+      "en": "{q, select, hit {A hit!! Chief, this one is big — tail revenue will keep coming for a while.} success {A success. Came out solid.} modest {Modest, but it holds.} other {It slipped by quietly. We learned something — we will get the next one.}}",
+      "surface": "S17", "speaker": "ria", "budget": "event", "transcreation": true,
+      "vars": { "q": "성과 등급 Q: hit|success|modest|flop" },
+      "note": "ICU select 예시(성과 등급 4분기). 실패작 비하 금지(narrative §6.3). 히트작=최대 축하."
+    },
+
+    "dialog.report.good": {
+      "ko": "순이익 흑자예요. 세 회사 다 순항 중 — 이런 달만 있으면 좋겠네요.",
+      "en": "Net profit is in the black. All three sailing smooth — I could get used to months like this.",
+      "surface": "S11", "speaker": "ria", "budget": "report", "transcreation": true,
+      "note": "좋은 달 리포트 소감. '조용한 달' 규칙 대상(반복 시 변주/생략)."
+    },
+    "dialog.report.tight": {
+      "ko": "간신히 넘겼어요. 상비 의뢰로 현금을 돌리고, 지출은 잠시 줄이죠.",
+      "en": "We just scraped through. Let us turn cash with Standing Jobs and ease off spending for now.",
+      "surface": "S11", "speaker": "ria", "budget": "report", "transcreation": true,
+      "note": "빠듯한 달. 다음 수를 비춤(절망 금지)."
+    },
+    "dialog.crisis.guide": {
+      "ko": "미지급이 생겼습니다. 조급해하지 마세요 — 상비 의뢰, 자진 강등, 정 안 되면 청산까지, 길은 있어요.",
+      "en": "A payment went unpaid. Take a breath — Standing Jobs, a voluntary downgrade, or liquidation if it comes to that. There is a way through.",
+      "surface": "S16", "speaker": "ria", "budget": "report", "transcreation": true,
+      "note": "위기(부실) 복귀 4수단 안내. 회복 경로 프레이밍(narrative §6.5)."
+    },
+
+    "error.funds.insufficient": {
+      "ko": "자금이 모자라요. 계약금 {amount, number}이 필요해요.",
+      "en": "Not enough funds. This needs {amount, number} for the signing fee.",
+      "surface": "common", "speaker": "ria", "budget": "notif", "transcreation": false,
+      "vars": { "amount": "필요 계약금(로케일 숫자 포맷)" },
+      "note": "명령 거부 사유(무엇을·왜). ICU number 포맷. 침묵 금지(ux §7.3)."
+    },
+
+    "common.action.confirm": {
+      "ko": "확인", "en": "Confirm",
+      "surface": "common", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "범용 확인. 강한 확인(2스텝)은 별도 문형."
+    },
+    "common.action.cancel": {
+      "ko": "취소", "en": "Cancel",
+      "surface": "common", "speaker": "none", "budget": "label", "transcreation": false
+    },
+    "common.reserved.snackbar": {
+      "ko": "예약됨 · 취소", "en": "Reserved · Undo",
+      "surface": "common", "speaker": "none", "budget": "label", "transcreation": false,
+      "note": "예약 커밋 전 취소(자연 되돌리기, ux §7.2). 범용 undo 아님."
+    },
+    "common.state.quiet_day": {
+      "ko": "오늘은 조용하네요.", "en": "All quiet today.",
+      "surface": "S0", "speaker": "ria", "budget": "report", "transcreation": true,
+      "note": "큐가 빌 때(모두 정상). 방치 존중, FOMO 금지."
+    }
+  }
+}
