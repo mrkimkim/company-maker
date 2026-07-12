@@ -43,13 +43,13 @@ GD 게임디자인 · ENG 엔지니어링 · UX · ART · AUD 오디오 · BM �
 - `✅` **1.1.4** 소프트런치 정량 게이트 운영 절차 명문화(방향값→실측 확정) (D-004)
 - `✅` **1.1.5** 통합 결정 로그(Decision Log) 작성 — `decision-log.md`
 
-### Phase 1.2 — 기술 기반 스파이크·엔진 결정 (`technical-architecture.md §13·§14`)
-- `☐` **1.2.1** 엔진·코어 언어 결정 (Unity/C# 1순위 vs Godot) — 표현 계층 착수 선행 (ENG) 👤
-- `☐` **1.2.2** 해시 PRNG·믹싱 상수 동결 스파이크 (SplitMix64 vs xxHash64 vs PCG) (ENG) 👤
-- `☐` **1.2.3** 고정소수 스케일 `FP` 동결 스파이크 (10⁶ vs Q32.32, 누적 오차 검증) (ENG) 👤
-- `☐` **1.2.4** 세이브 직렬화 포맷 결정 (FlatBuffers vs MessagePack) (ENG) 👤
-- `☐` **1.2.5** 결정론 코어(L1) 골격·CI 훅(리플레이·회사 순서 무관성) 셋업 (ENG)
-- `☐` **1.2.6** BaaS·MMP 벤더 후보 PoC 계획 (ENG·MKT) 👤
+### Phase 1.2 — 기술 기반 스파이크·엔진 결정 (`technical-architecture.md §13·§14`) — 계획·권장안 준비됨 → `tech-spikes-and-decisions.md`
+- `👤` **1.2.1** 엔진·코어 언어 결정 (Unity/C# 1순위 vs Godot) — 표현 계층 착수 선행 (ENG) — 평가표·권장안 준비(D-102)
+- `👤` **1.2.2** 해시 PRNG·믹싱 상수 동결 스파이크 (SplitMix64 권장) (ENG) — 스파이크 계획·수용 기준 준비(D-103)
+- `👤` **1.2.3** 고정소수 스케일 `FP` 동결 스파이크 (10⁶+i128 권장) (ENG) — 스파이크 계획 준비(D-104)
+- `👤` **1.2.4** 세이브 직렬화 포맷 결정 (FlatBuffers 권장) (ENG) — 스파이크 계획 준비(D-105)
+- `☐` **1.2.5** 결정론 코어(L1) 골격·CI 훅(리플레이·회사 순서 무관성) 셋업 (ENG) — M2 스펙 연동
+- `👤` **1.2.6** BaaS·MMP 벤더 후보 PoC 계획 (ENG·MKT) — 계약 요구는 `server-api-and-pipeline.md`(D-106)
 
 ### Phase 1.3 — 아트·오디오 스타일 프레임 (`art-direction.md`·`audio-design.md`)
 - `✅` **1.3.1** 색 토큰 HEX 팔레트 v0 확정(라이트/다크·업종3·시맨틱·등급·자원 + 브랜드 액센트, 전 토큰 대비 게이트 통과) — `design-tokens.md`
